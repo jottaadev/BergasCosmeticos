@@ -8,7 +8,7 @@ Crie um arquivo `.env.local` na raiz do projeto com o seguinte conteúdo:
 ```env
 # Configurações de Autenticação
 ADMIN_EMAIL=admin@admin.com
-ADMIN_PASSWORD=admin
+ADMIN_PASSWORD_HASH=$2a$12$GTrna3JjylJeSd4RxLRTKOPW/fERMEEF529ZttliqpepB.Lcn2oGW
 AUTH_SECRET=dev-secret-change-me
 
 # Configurações do Banco de Dados (SQLite para desenvolvimento)
@@ -24,7 +24,7 @@ Configure as variáveis de ambiente no painel do Vercel:
 ```env
 # Configurações de Autenticação
 ADMIN_EMAIL=admin@admin.com
-ADMIN_PASSWORD=admin
+ADMIN_PASSWORD_HASH=$2a$12$GTrna3JjylJeSd4RxLRTKOPW/fERMEEF529ZttliqpepB.Lcn2oGW
 AUTH_SECRET=uma-chave-super-secreta-e-aleatoria-para-producao
 
 # Configurações do Banco de Dados (Supabase PostgreSQL)

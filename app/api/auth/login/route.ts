@@ -1,19 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { signSession } from '@/lib/session'
+import bcrypt from 'bcryptjs'
 
 // Para produção, use variável de ambiente forte
 const SECRET = process.env.AUTH_SECRET
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD
+const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH
 
-if (!SECRET || !ADMIN_EMAIL || !ADMIN_PASSWORD) {
-  throw new Error('Variáveis de ambiente AUTH_SECRET, ADMIN_EMAIL e ADMIN_PASSWORD são obrigatórias')
+if (!SECRET || !ADMIN_EMAIL || !ADMIN_PASSWORD_HASH) {
+  throw new Error('Variáveis de ambiente AUTH_SECRET, ADMIN_EMAIL e ADMIN_PASSWORD_HASH são obrigatórias')
 }
 
 // Garantir que as variáveis não são undefined após a verificação
 const authSecret = SECRET as string
 const adminEmail = ADMIN_EMAIL as string
-const adminPassword = ADMIN_PASSWORD as string
+const adminPasswordHash = ADMIN_PASSWORD_HASH as string
 
 export async function POST(req: NextRequest) {
   try {
@@ -22,7 +23,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Credenciais inválidas' }, { status: 400 })
     }
 
-    if (email !== adminEmail || password !== adminPassword) {
+    // Verificar email
+    if (email !== adminEmail) {
+      return NextResponse.json({ error: 'Email ou senha incorretos' }, { status: 401 })
+    }
+
+    // Verificar senha com hash
+    const isValidPassword = await bcrypt.compare(password, adminPasswordHash)
+    if (!isValidPassword) {
       return NextResponse.json({ error: 'Email ou senha incorretos' }, { status: 401 })
     }
 
