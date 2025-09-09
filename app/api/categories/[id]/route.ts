@@ -4,11 +4,12 @@ import { prisma } from '@/lib/prisma'
 // GET - Buscar categoria por ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const category = await prisma.category.findUnique({
-      where: { id: params.id }
+      where: { id }
     })
 
     if (!category) {
@@ -31,9 +32,10 @@ export async function GET(
 // PUT - Atualizar categoria
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const body = await request.json()
     
     // Criar objeto de dados apenas com os campos fornecidos
@@ -55,7 +57,7 @@ export async function PUT(
     }
 
     const category = await prisma.category.update({
-      where: { id: params.id },
+      where: { id },
       data: updateData
     })
 
@@ -80,12 +82,13 @@ export async function PUT(
 // DELETE - Deletar categoria
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     // Verificar se há produtos usando esta categoria
     const productsCount = await prisma.product.count({
-      where: { category: { contains: params.id } }
+      where: { category: { contains: id } }
     })
 
     if (productsCount > 0) {
@@ -96,7 +99,7 @@ export async function DELETE(
     }
 
     await prisma.category.delete({
-      where: { id: params.id }
+      where: { id }
     })
 
     return NextResponse.json({ message: 'Categoria excluída com sucesso' })

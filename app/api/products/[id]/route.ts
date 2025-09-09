@@ -4,11 +4,12 @@ import { prisma } from '@/lib/prisma'
 // GET - Buscar produto por ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const product = await prisma.product.findUnique({
-      where: { id: params.id }
+      where: { id }
     })
 
     if (!product) {
@@ -31,9 +32,10 @@ export async function GET(
 // PUT - Atualizar produto
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const body = await request.json()
     
     // Criar objeto de dados apenas com os campos fornecidos
@@ -53,7 +55,7 @@ export async function PUT(
     // Validar limite de no máximo 3 produtos em destaque ao ativar featured
     if (body.featured === true) {
       const featuredCount = await prisma.product.count({
-        where: { featured: true, NOT: { id: params.id } }
+        where: { featured: true, NOT: { id } }
       })
       if (featuredCount >= 3) {
         return NextResponse.json(
@@ -72,7 +74,7 @@ export async function PUT(
     }
 
     const product = await prisma.product.update({
-      where: { id: params.id },
+      where: { id },
       data: updateData
     })
 
@@ -89,11 +91,12 @@ export async function PUT(
 // DELETE - Deletar produto
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     await prisma.product.delete({
-      where: { id: params.id }
+      where: { id }
     })
 
     return NextResponse.json({ message: 'Produto deletado com sucesso' })
